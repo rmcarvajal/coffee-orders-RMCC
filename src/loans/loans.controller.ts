@@ -24,4 +24,15 @@ export class LoansController {
   create(@Body() body: CreateLoanDto) {
     return this.loansService.create(body);
   }
+
+  @Get(':id')
+  deleteLoan(@Param('id') id: string) {
+    const loan = this.loansService.deleteLoan(Number(id));
+
+    if (!loan) {
+      throw new NotFoundException('there is no loan with id ' + id);
+    }
+
+    return loan;
+  }
 }
