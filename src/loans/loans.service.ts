@@ -41,6 +41,6 @@ export class LoansService {
 
   deleteLoan(id: number): Loan[] {
     const cutLoans = this.loans.filter((loan) => loan.id !== id);
-    return cutLoans;
+    return (this.loans = cutLoans);
   }
 }
