@@ -136,4 +136,13 @@ export class OrdersService {
 
     return this.orderPriorityService.classify(order);
   }
+
+  async findPendingQueue(): Promise<OrderEntity[]> {
+    return this.ordersRepository.find({
+      where: { status: 'pending' },
+      relations: { customer: true },
+      order: { createdAt: 'ASC' },
+      take: 5,
+    });
+  }
 }
