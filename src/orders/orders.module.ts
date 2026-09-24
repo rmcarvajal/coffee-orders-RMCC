@@ -7,6 +7,7 @@ import { OrdersController } from './orders.controller';
 import { OrdersService } from './orders.service';
 // import { OrderSummaryService } from './order-summary/order-summary.service';
 import { OrderPreparationEstimateService } from './order-preparation-estimate/order-preparation-estimate.service';
+import { OrderPriorityService } from './order-priority.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([CustomerEntity, OrderEntity])],
@@ -15,6 +16,7 @@ import { OrderPreparationEstimateService } from './order-preparation-estimate/or
     OrdersService,
     OrderRulesService,
     OrderPreparationEstimateService,
+    OrderPriorityService,
   ],
 })
 export class OrdersModule {}

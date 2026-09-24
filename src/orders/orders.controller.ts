@@ -59,4 +59,9 @@ export class OrdersController {
   estimatePrepatationTime(@Param('id') id: string) {
     return this.ordersService.estimatePreparationTime(Number(id));
   }
+
+  @Get(':id/priority')
+  getPriority(@Param('id') id: string) {
+    return this.ordersService.getPriority(Number(id));
+  }
 }

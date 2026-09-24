@@ -7,6 +7,7 @@ import { OrderEntity } from './entities/order.entity';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderRulesService } from './order-rules/order-rules.service';
 import { OrderPreparationEstimateService } from './order-preparation-estimate/order-preparation-estimate.service';
+import { OrderPriorityService } from './order-priority.service';
 // import { OrderSummaryService } from './order-summary/order-summary.service';
 
 @Injectable()
@@ -22,6 +23,8 @@ export class OrdersService {
 
     private readonly orderPreparationEstimateService: OrderPreparationEstimateService,
     // private readonly orderSummaryService: OrderSummaryService,
+
+    private readonly orderPriorityService: OrderPriorityService,
   ) {}
 
   async create(createOrderDto: CreateOrderDto): Promise<OrderEntity> {
@@ -120,5 +123,17 @@ export class OrdersService {
       order: { createdAt: 'DESC' },
       take: 3,
     });
+  }
+
+  async getPriority(id: number): Promise<{
+    orderId: number;
+    status: string;
+    quantity: number;
+    priority: 'completed' | 'high' | 'medium' | 'normal';
+    message: string;
+  }> {
+    const order = await this.findOne(id);
+
+    return this.orderPriorityService.classify(order);
   }
 }
