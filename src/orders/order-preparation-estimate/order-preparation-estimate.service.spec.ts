@@ -12,10 +12,10 @@ describe('OrderPreparationEstimateServiceTest', () => {
       id: 1,
     } as OrderEntity;
 
-    expect(service.estimate(mockOrder)).toStrictEqual({
+    expect(service.estimate(mockOrder)).toEqual({
       orderId: 1,
       status: 'ready',
-      estimatedMinutes: 0,
+      estimatedTime: 0,
     });
   });
 });

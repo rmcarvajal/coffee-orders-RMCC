@@ -15,7 +15,7 @@ export class OrderPriorityService {
         ? 'completed'
         : order.quantity >= 4
           ? 'high'
-          : order.quantity <= 2
+          : order.quantity >= 2
             ? 'medium'
             : 'normal';
 
