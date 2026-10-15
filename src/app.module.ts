@@ -21,7 +21,7 @@ import { OrdersModule } from "./orders/orders.module";
         password: configService.get<string>("DB_PASSWORD") ?? "postgres",
         database: configService.get<string>("DB_DATABASE") ?? "coffee_orders",
         autoLoadEntities: true,
-        synchronize: true,
+        synchronize: false,
         ssl: configService.get<string>('NODE_ENV') === 'production',
       }),
     }),
