@@ -1,14 +1,13 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { CreateOrderDto } from './dto/create-order.dto';
-import { CustomerEntity } from './entities/customer.entity';
-import { OrderEntity } from './entities/order.entity';
-import { UpdateOrderDto } from './dto/update-order.dto';
-import { OrderRulesService } from './order-rules/order-rules.service';
-import { OrderPreparationEstimateService } from './order-preparation-estimate/order-preparation-estimate.service';
-import { OrderPriorityService } from './order-priority.service';
-// import { OrderSummaryService } from './order-summary/order-summary.service';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { CreateOrderDto } from "./dto/create-order.dto";
+import { InjectRepository } from "@nestjs/typeorm";
+import { CustomerEntity } from "./entities/customer.entity";
+import { OrderEntity } from "./entities/order.entity";
+import { Repository } from "typeorm";
+import { UpdateOrderDto } from "./dto/update-order.dto";
+import { OrderRulesService } from "./order-rules/order-rules.service";
+import { FilterOrderQueryDto } from "./dto/filter-orders-query.dto";
+import { OrderPreparationEstimateService } from "./order-preparation-estimate/order-preparation-estimate.service";
 
 @Injectable()
 export class OrdersService {
@@ -22,29 +21,28 @@ export class OrdersService {
     private readonly orderRulesService: OrderRulesService,
 
     private readonly orderPreparationEstimateService: OrderPreparationEstimateService,
-    // private readonly orderSummaryService: OrderSummaryService,
-
-    private readonly orderPriorityService: OrderPriorityService,
   ) {}
 
   async create(createOrderDto: CreateOrderDto): Promise<OrderEntity> {
     const customer = await this.customersRepository.findOneBy({
-      id: createOrderDto.customer_id,
+      id: createOrderDto.customerId,
     });
 
     if (!customer) {
       throw new NotFoundException(
-        `Customer with id ${createOrderDto.customer_id} was not found`,
+        `Customer with id ${createOrderDto.customerId} was not found`,
       );
     }
 
+    //Primero creo, luego guardo
     const order = this.ordersRepository.create({
       item: createOrderDto.item,
       quantity: createOrderDto.quantity,
-      status: 'pending',
+      status: "pending",
       customer,
     });
 
+    //Guardo en la base de datos y retorno el objeto guardado
     return this.ordersRepository.save(order);
   }
 
@@ -54,7 +52,7 @@ export class OrdersService {
         customer: true,
       },
       order: {
-        id: 'ASC',
+        id: "ASC",
       },
     });
   }
@@ -92,57 +90,40 @@ export class OrdersService {
   }
 
   async markAsReady(id: number): Promise<OrderEntity> {
-    const order = await this.findOne(id);
-
+    const order = await this.findOne(id); //Fue y busco la orden y si la encuentra la pone en la constante y sino marca error
     this.orderRulesService.ensureCanBeMarkedAsReady(order);
-
-    order.status = 'ready';
+    order.status = "ready";
 
     return this.ordersRepository.save(order);
   }
 
-  // async summary(): Promise<OrderEntity[]> {
-  //   return this.orderSummaryService.ensureSummary();
-  // }
-
   async estimatePreparationTime(id: number): Promise<{
     orderId: number;
     status: string;
-    estimatedTime: number;
+    estimatedMinutes: number;
   }> {
     const order = await this.findOne(id);
-
     return this.orderPreparationEstimateService.estimate(order);
   }
 
   async findRecentPending(): Promise<OrderEntity[]> {
     return this.ordersRepository.find({
-      where: { status: 'pending' },
-      // where: { quantity: MoreThan(1) },
-      relations: { customer: true },
-      order: { createdAt: 'DESC' },
-      take: 3,
+      // where: { quantity: LessThan(2) },
+      where: { status: "pending" },
+      order: { createdAt: "ASC" },
+      take: 2,
+      relations: {
+        customer: true,
+      },
     });
   }
 
-  async getPriority(id: number): Promise<{
-    orderId: number;
-    status: string;
-    quantity: number;
-    priority: 'completed' | 'high' | 'medium' | 'normal';
-    message: string;
-  }> {
-    const order = await this.findOne(id);
-
-    return this.orderPriorityService.classify(order);
-  }
-
-  async findPendingQueue(): Promise<OrderEntity[]> {
+  async findFiltered(query: FilterOrderQueryDto) {
     return this.ordersRepository.find({
-      where: { status: 'pending' },
+      where: query.status ? { status: query.status } : {},
       relations: { customer: true },
-      order: { createdAt: 'ASC' },
-      take: 5,
+      order: { id: query.sortOrder },
+      take: query.limit,
     });
   }
 }

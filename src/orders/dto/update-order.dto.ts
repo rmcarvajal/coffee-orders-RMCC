@@ -1,5 +1,5 @@
 export class UpdateOrderDto {
   item?: string;
   quantity?: number;
-  status?: 'pending' | 'ready';
+  status?: "pending" | "ready";
 }

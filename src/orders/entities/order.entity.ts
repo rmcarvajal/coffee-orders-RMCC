@@ -5,10 +5,10 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
-} from 'typeorm';
-import { CustomerEntity } from './customer.entity';
+} from "typeorm";
+import { CustomerEntity } from "./customer.entity";
 
-@Entity('orders')
+@Entity("orders")
 export class OrderEntity {
   @PrimaryGeneratedColumn()
   id!: number;
@@ -16,18 +16,24 @@ export class OrderEntity {
   @Column({ length: 120 })
   item!: string;
 
-  @Column({ type: 'int', default: 1 })
+  @Column({ type: "int", default: 1 })
   quantity!: number;
 
-  @Column({ type: 'varchar', length: 20, default: 'pending' })
-  status!: 'pending' | 'ready';
+  @Column({ type: "varchar", length: 20, default: "pending" })
+  status!: "pending" | "ready";
 
   @ManyToOne(() => CustomerEntity, (customer) => customer.orders, {
     nullable: false,
   })
-  @JoinColumn({ name: 'customer_id' })
+  @JoinColumn({ name: "customer_id" })
   customer!: CustomerEntity;
 
-  @CreateDateColumn({ name: 'created_at' })
+  // @ManyToOne(() => DiningEntity, (dining) => dining.orders, {
+  //   nullable: false,
+  // })
+  // @JoinColumn({ name: "dining_id" })
+  // dining!: DiningEntity;
+
+  @CreateDateColumn({ name: "created_at" })
   createdAt!: Date;
 }

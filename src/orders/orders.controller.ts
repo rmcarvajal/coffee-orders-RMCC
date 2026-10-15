@@ -1,72 +1,72 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
-} from '@nestjs/common';
-import { CreateOrderDto } from './dto/create-order.dto';
-import { OrdersService } from './orders.service';
-import { UpdateOrderDto } from './dto/update-order.dto';
+  ValidationPipe,
+  Delete,
+  Query,
+} from "@nestjs/common";
+import { CreateOrderDto } from "./dto/create-order.dto";
+import { OrdersService } from "./orders.service";
+import { UpdateOrderDto } from "./dto/update-order.dto";
+import { FilterOrderQueryDto } from "./dto/filter-orders-query.dto";
 
-@Controller('orders')
+const requestValidationPipe = new ValidationPipe({
+  transform: true,
+  whitelist: true,
+  forbidNonWhitelisted: true,
+});
+
+@Controller("orders")
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
-
-  @Post()
-  create(@Body() createOrderDto: CreateOrderDto) {
-    return this.ordersService.create(createOrderDto);
-  }
 
   @Get()
   findAll() {
     return this.ordersService.findAll();
   }
 
-  // @Get('summary')
-  // summary() {
-  //   return this.ordersService.summary();
-  // }
+  @Post()
+  create(@Body(requestValidationPipe) createOrderDto: CreateOrderDto) {
+    return this.ordersService.create(createOrderDto);
+  }
 
-  @Get('pending')
+  @Get("search")
+  search(@Query(requestValidationPipe) query: FilterOrderQueryDto) {
+    return this.ordersService.findFiltered(query);
+  }
+
+  @Get(":id")
+  findOne(@Param("id", ParseIntPipe) id: number) {
+    return this.ordersService.findOne(id);
+  }
+
+  @Patch(":id")
+  update(@Param("id", ParseIntPipe) id: number, @Body() dto: UpdateOrderDto) {
+    return this.ordersService.update(id, dto);
+  }
+
+  @Delete(":id")
+  remove(@Param("id", ParseIntPipe) id: number) {
+    return this.ordersService.remove(id);
+  }
+
+  @Patch(":id/ready")
+  markAsReady(@Param("id", ParseIntPipe) id: number) {
+    return this.ordersService.markAsReady(id);
+  }
+
+  @Get(":id/estimate")
+  estimatePreparationTime(@Param("id", ParseIntPipe) id: number) {
+    return this.ordersService.estimatePreparationTime(id);
+  }
+
+  @Get("pending")
   findRecentPending() {
     return this.ordersService.findRecentPending();
-  }
-
-  @Get('pending-queue')
-  findPendingQueue() {
-    return this.ordersService.findPendingQueue();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.ordersService.findOne(Number(id));
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
-    return this.ordersService.update(Number(id), updateOrderDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.ordersService.remove(Number(id));
-  }
-
-  @Patch(':id/ready')
-  markAsReady(@Param('id') id: string) {
-    return this.ordersService.markAsReady(Number(id));
-  }
-
-  @Get(':id/estimate')
-  estimatePrepatationTime(@Param('id') id: string) {
-    return this.ordersService.estimatePreparationTime(Number(id));
-  }
-
-  @Get(':id/priority')
-  getPriority(@Param('id') id: string) {
-    return this.ordersService.getPriority(Number(id));
   }
 }
