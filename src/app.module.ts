@@ -22,6 +22,7 @@ import { OrdersModule } from "./orders/orders.module";
         database: configService.get<string>("DB_DATABASE") ?? "coffee_orders",
         autoLoadEntities: true,
         synchronize: true,
+        ssl: configService.get<string>('NODE_ENV') === 'production',
       }),
     }),
     OrdersModule,
