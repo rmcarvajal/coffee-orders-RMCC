@@ -9,11 +9,11 @@ import {
   ValidationPipe,
   Delete,
   Query,
-} from "@nestjs/common";
-import { CreateOrderDto } from "./dto/create-order.dto";
-import { OrdersService } from "./orders.service";
-import { UpdateOrderDto } from "./dto/update-order.dto";
-import { FilterOrderQueryDto } from "./dto/filter-orders-query.dto";
+} from '@nestjs/common';
+import { CreateOrderDto } from './dto/create-order.dto';
+import { OrdersService } from './orders.service';
+import { UpdateOrderDto } from './dto/update-order.dto';
+import { FilterOrderQueryDto } from './dto/filter-orders-query.dto';
 
 const requestValidationPipe = new ValidationPipe({
   transform: true,
@@ -21,7 +21,7 @@ const requestValidationPipe = new ValidationPipe({
   forbidNonWhitelisted: true,
 });
 
-@Controller("orders")
+@Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
@@ -35,37 +35,37 @@ export class OrdersController {
     return this.ordersService.create(createOrderDto);
   }
 
-  @Get("search")
+  @Get('search')
   search(@Query(requestValidationPipe) query: FilterOrderQueryDto) {
     return this.ordersService.findFiltered(query);
   }
 
-  @Get(":id")
-  findOne(@Param("id", ParseIntPipe) id: number) {
+  @Get(':id')
+  findOne(@Param('id', ParseIntPipe) id: number) {
     return this.ordersService.findOne(id);
   }
 
-  @Patch(":id")
-  update(@Param("id", ParseIntPipe) id: number, @Body() dto: UpdateOrderDto) {
+  @Patch(':id')
+  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateOrderDto) {
     return this.ordersService.update(id, dto);
   }
 
-  @Delete(":id")
-  remove(@Param("id", ParseIntPipe) id: number) {
+  @Delete(':id')
+  remove(@Param('id', ParseIntPipe) id: number) {
     return this.ordersService.remove(id);
   }
 
-  @Patch(":id/ready")
-  markAsReady(@Param("id", ParseIntPipe) id: number) {
+  @Patch(':id/ready')
+  markAsReady(@Param('id', ParseIntPipe) id: number) {
     return this.ordersService.markAsReady(id);
   }
 
-  @Get(":id/estimate")
-  estimatePreparationTime(@Param("id", ParseIntPipe) id: number) {
+  @Get(':id/estimate')
+  estimatePreparationTime(@Param('id', ParseIntPipe) id: number) {
     return this.ordersService.estimatePreparationTime(id);
   }
 
-  @Get("pending")
+  @Get('pending')
   findRecentPending() {
     return this.ordersService.findRecentPending();
   }
